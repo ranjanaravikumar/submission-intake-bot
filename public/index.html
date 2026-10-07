@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Intake Desk | qBotica</title>
+  <!-- IBM Plex is qBotica's digital typeface. Served locally so it works offline. -->
+  <link rel="stylesheet" href="/fonts/plex-sans/400.css">
+  <link rel="stylesheet" href="/fonts/plex-sans/500.css">
+  <link rel="stylesheet" href="/fonts/plex-sans/600.css">
+  <link rel="stylesheet" href="/fonts/plex-sans/700.css">
+  <link rel="stylesheet" href="/fonts/plex-sans/400-italic.css">
+  <link rel="stylesheet" href="/fonts/plex-condensed/700.css">
+  <link rel="stylesheet" href="/fonts/plex-mono/400.css">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <!-- Official logo file goes in public/brand/ (see public/brand/README.txt). -->
+      <img class="brand-logo" id="brand-logo" alt="qBotica" hidden>
+      <span class="brand-fallback" id="brand-fallback">qBotica</span>
+      <span class="brand-divider" aria-hidden="true"></span>
+      <div>
+        <div class="brand-name">Intake Desk</div>
+        <div class="brand-sub" id="role-tagline">Incoming submissions, read and checked before underwriting</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <label class="role-picker">
+        <span>Viewing as</span>
+        <select id="role">
+          <option value="carrier">Carrier</option>
+          <option value="agency">Agency</option>
+          <option value="broker">Broker</option>
+          <option value="tech">Technology partner</option>
+        </select>
+      </label>
+      <button class="btn ghost" id="open-settings" type="button">Settings</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="rail">
+      <section class="new" aria-labelledby="new-title">
+        <h2 id="new-title">New submission</h2>
+        <div class="tabs" role="tablist" aria-label="Intake channel">
+          <button role="tab" class="tab" data-channel="upload" aria-selected="true">Upload</button>
+          <button role="tab" class="tab" data-channel="email" aria-selected="false">Email</button>
+          <button role="tab" class="tab" data-channel="api" aria-selected="false">API</button>
+        </div>
+
+        <div class="pane" data-pane="upload">
+          <label class="drop" id="drop-upload">
+            <input type="file" id="file-input" multiple accept=".pdf,.png,.jpg,.jpeg,.tif,.tiff,.txt">
+            <strong>Drop ACORD forms, scans, or PDFs</strong>
+            <span>or click to browse</span>
+          </label>
+          <ul class="picked" id="picked-files"></ul>
+          <button class="btn primary block" id="send-upload" type="button" disabled>Process submission</button>
+        </div>
+
+        <div class="pane" data-pane="email" hidden>
+          <label class="drop" id="drop-email">
+            <input type="file" id="eml-input" accept=".eml,message/rfc822">
+            <strong>Drop a forwarded .eml file</strong>
+            <span id="eml-name">attachments are pulled out automatically</span>
+          </label>
+          <textarea id="email-raw" rows="4" placeholder="Or paste the email text here"></textarea>
+          <button class="btn primary block" id="send-email" type="button">Process email</button>
+        </div>
+
+        <div class="pane" data-pane="api" hidden>
+          <p class="hint">Partner systems (an AMS, a rater, a portal) post files here. They land in the inbox like any other submission.</p>
+          <pre class="code" id="curl"></pre>
+          <div class="row-actions">
+            <button class="btn ghost" id="copy-curl" type="button">Copy request</button>
+            <button class="btn primary" id="send-api" type="button">Send a test request</button>
+          </div>
+        </div>
+        <p class="channel-off" id="channel-off" hidden>This channel is turned off. Turn it on in Settings.</p>
+      </section>
+
+      <section class="inbox" aria-labelledby="inbox-title">
+        <h2 id="inbox-title">Incoming submissions</h2>
+        <ul id="inbox"></ul>
+        <p class="empty-note" id="inbox-empty">Nothing here yet. Upload a file, forward an email, or send one through the API.</p>
+      </section>
+
+      <footer class="rail-foot"><strong>Enterprise AI. Delivered.</strong><span>qbotica.com</span></footer>
+    </aside>
+
+    <main class="workspace" id="workspace">
+      <div class="blank" id="blank">
+        <div class="blank-sheet" aria-hidden="true">
+          <span></span><span></span><span></span><span class="hl"></span><span></span>
+        </div>
+        <span class="rule" aria-hidden="true"></span>
+        <h1>Messy documents in, clean submissions out</h1>
+        <p>Pick a submission from the inbox, or add one above to watch it move through intake: read, classify, extract, and check, before anything reaches underwriting.</p>
+      </div>
+
+      <article class="submission" id="submission" hidden>
+        <header class="sub-head">
+          <div>
+            <span class="rule" aria-hidden="true"></span>
+            <h1 id="sub-name"></h1>
+            <p class="sub-meta" id="sub-meta"></p>
+          </div>
+          <span class="status" id="sub-status"></span>
+        </header>
+        <p class="summary" id="sub-summary" hidden></p>
+
+        <ol class="pipeline" id="pipeline" aria-label="Intake steps"></ol>
+
+        <div class="panes">
+          <section class="docs" aria-labelledby="docs-title">
+            <div class="panel-head">
+              <h2 id="docs-title">Documents</h2>
+              <div class="toggle" role="group" aria-label="Document view">
+                <button type="button" data-view="original" aria-pressed="true">Original</button>
+                <button type="button" data-view="text" aria-pressed="false">Text read</button>
+              </div>
+            </div>
+            <div class="doc-tabs" id="doc-tabs"></div>
+            <div class="viewer" id="viewer"></div>
+            <p class="doc-foot" id="doc-foot"></p>
+          </section>
+
+          <section class="record" aria-labelledby="record-title">
+            <div class="panel-head">
+              <h2 id="record-title">Submission record</h2>
+              <span class="engine" id="engine"></span>
+            </div>
+            <div class="readiness" id="readiness"></div>
+            <ul class="issues" id="issues"></ul>
+            <form class="fields" id="fields" autocomplete="off" onsubmit="return false"></form>
+            <div class="actionbar">
+              <button class="btn ghost" id="btn-followup" type="button">Draft follow-up email</button>
+              <button class="btn ghost" id="btn-json" type="button">View ACORD JSON</button>
+              <button class="btn primary" id="btn-send" type="button">Send to underwriting</button>
+            </div>
+          </section>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <dialog id="dlg-settings" class="sheet-dialog" aria-labelledby="settings-title">
+    <div class="dlg-head">
+      <h2 id="settings-title">Settings</h2>
+      <button class="btn ghost" data-close type="button">Done</button>
+    </div>
+    <p class="hint">Every company runs intake differently. These are the dials each client can set. Items marked roadmap are designed but not built in this demo.</p>
+    <div id="settings-body"></div>
+  </dialog>
+
+  <dialog id="dlg-json" class="sheet-dialog wide" aria-labelledby="json-title">
+    <div class="dlg-head">
+      <h2 id="json-title">ACORD-aligned payload</h2>
+      <div class="row-actions">
+        <button class="btn ghost" id="copy-json" type="button">Copy</button>
+        <button class="btn ghost" id="download-json" type="button">Download</button>
+        <button class="btn ghost" data-close type="button">Close</button>
+      </div>
+    </div>
+    <p class="hint" id="json-hint">This is what an AMS or carrier system integration would receive.</p>
+    <pre class="code tall" id="json-body"></pre>
+  </dialog>
+
+  <dialog id="dlg-followup" class="sheet-dialog" aria-labelledby="followup-title">
+    <div class="dlg-head">
+      <h2 id="followup-title">Follow-up email</h2>
+      <button class="btn ghost" data-close type="button">Close</button>
+    </div>
+    <label class="stack"><span>To</span><input id="fu-to"></label>
+    <label class="stack"><span>Subject</span><input id="fu-subject"></label>
+    <label class="stack"><span>Message</span><textarea id="fu-body" rows="12"></textarea></label>
+    <div class="row-actions end">
+      <button class="btn ghost" id="fu-copy" type="button">Copy message</button>
+      <a class="btn primary" id="fu-mail" href="#">Open in mail app</a>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

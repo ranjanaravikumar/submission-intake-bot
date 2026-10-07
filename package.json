@@ -1,0 +1,27 @@
+{
+  "name": "submission-intake-bot",
+  "version": "0.1.0",
+  "description": "Turns ACORD forms, emails, and scans into clean, validated insurance submissions.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "samples": "python3 tools/make_samples.py"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@fontsource/ibm-plex-sans-condensed": "^5.3.0",
+    "@tesseract.js-data/eng": "^1.0.0",
+    "dotenv": "^18.0.3",
+    "express": "^5.2.1",
+    "mailparser": "^3.9.28",
+    "multer": "^2.4.0",
+    "pdf-parse": "1.1.1",
+    "tesseract.js": "^7.0.0"
+  }
+}
