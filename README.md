@@ -23,6 +23,53 @@ Carriers, agencies, and brokers receive hundreds of new-business submissions a w
 
 For the full technical design, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
+## Demo
+
+### 1. Intake Dashboard
+
+![Intake Dashboard](screenshots/01-intake.png)
+
+### 2. Document Upload
+
+![Document Upload](screenshots/02-upload.png)
+
+### 3. OCR Processing
+
+![OCR Processing](screenshots/03-ocr.png)
+
+### 4. Document Classification
+
+![Document Classification](screenshots/04-classify.png)
+
+### 5. Field Extraction
+
+![Field Extraction](screenshots/05-extract.png)
+
+### 6. Validation
+
+![Validation](screenshots/06-validate.png)
+
+### 7. Missing Field Review
+
+![Missing Field Review](screenshots/07-review-missing-field.png)
+
+### 8. Enter Missing Information
+
+![Enter Missing Information](screenshots/08-review-enter-number.png)
+
+### 9. Confirm Information
+
+![Confirm Information](screenshots/09-review-confirm.png)
+
+### 10. Send to Underwriting
+
+![Send to Underwriting](screenshots/10-send.png)
+
+### 11. Final Result
+
+![Final Result](screenshots/11-final.png)
+
+
 ## Run it
 
 ```bash
